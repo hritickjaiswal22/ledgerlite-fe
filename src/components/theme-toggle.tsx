@@ -27,13 +27,13 @@ function ThemeToggler() {
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button variant="outline" aria-label="Toggle theme">
+          <Button variant="ghost" aria-label="Toggle theme" size={"icon"}>
             {resolvedTheme === "light" ? (
-              <Sun />
+              <Sun className="!size-5" />
             ) : resolvedTheme === "dark" ? (
-              <Moon />
+              <Moon className="!size-5" />
             ) : (
-              <Cpu />
+              <Cpu className="!size-5" />
             )}
           </Button>
         }

@@ -4,7 +4,7 @@ import ModeToggler from "@/components/theme-toggle";
 function Home() {
   return (
     <div>
-      <Button size={"lg"}>Hello World</Button>
+      <Button size={"lg"}>Create your account</Button>
 
       <ModeToggler />
     </div>
