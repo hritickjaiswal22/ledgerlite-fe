@@ -3,3 +3,8 @@ export interface SignUpRequestBody {
   password: string;
   selectedCurrencyId: string;
 }
+
+export interface SignInRequestBody {
+  email: string;
+  password: string;
+}

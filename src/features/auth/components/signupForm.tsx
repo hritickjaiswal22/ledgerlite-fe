@@ -19,7 +19,6 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { getCurrencies } from "@/features/currencies/api";
 import { signup } from "@/features/auth/api";
-import { queryClient } from "@/lib/query-client";
 
 function SignupForm() {
   const router = useRouter();
