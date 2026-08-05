@@ -53,10 +53,6 @@ export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("access_token")?.value;
   const refreshToken = request.cookies.get("refresh_token")?.value;
 
-  console.log("-------------------------middleware--------------------------");
-  console.log("accessToken", accessToken);
-  console.log("refreshToken", refreshToken);
-
   // Extract the pathname from nextUrl
   const { pathname } = request.nextUrl;
 
@@ -84,8 +80,6 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
   }
-
-  console.log("-------------------------refresh--------------------------");
 
   // refresh logic
   const serverRes = await fetch(`${EXPRESS_URL}/auth/refresh`, {

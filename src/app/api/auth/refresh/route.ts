@@ -9,8 +9,6 @@ const EXPRESS_URL = process.env.EXPRESS_API_URL;
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("-------------------reefresh route----------------------");
-
     const refreshToken = request.cookies.get("refresh_token")?.value;
 
     const redirectTo = request.nextUrl.searchParams.get("redirect") || "/";
