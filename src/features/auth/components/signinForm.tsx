@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { signin } from "@/features/auth/api";
+import { SignInRequestBody } from "@/features/auth/types";
 
 function SigninForm() {
   const router = useRouter();
@@ -18,11 +18,29 @@ function SigninForm() {
       router.replace("/accounts");
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message || "");
+      toast.error(error.message || "", {
+        position: "top-right",
+      });
     },
   });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  async function signin(body: SignInRequestBody) {
+    const response = await fetch("/api/auth/signin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw result;
+    }
+
+    return result;
+  }
 
   async function submitHandler() {
     if (email && password) {

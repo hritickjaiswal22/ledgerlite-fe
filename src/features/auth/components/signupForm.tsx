@@ -17,8 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
-import { getCurrencies } from "@/features/currencies/api";
-import { signup } from "@/features/auth/api";
+import { SignUpRequestBody } from "@/features/auth/types";
+import { GetCurrenciesResponse } from "@/features/currencies/types";
 
 function SignupForm() {
   const router = useRouter();
@@ -32,7 +32,9 @@ function SignupForm() {
       router.replace("/accounts");
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message || "");
+      toast.error(error.message || "", {
+        position: "top-right",
+      });
     },
   });
   const [email, setEmail] = useState("");
@@ -52,7 +54,30 @@ function SignupForm() {
     label: "Your Currency",
   });
 
-  async function submitHandler() {
+  async function getCurrencies() {
+    const response = await fetch(`api/currencies`);
+    const { data }: GetCurrenciesResponse = await response.json();
+
+    return data;
+  }
+
+  async function signup(body: SignUpRequestBody) {
+    const response = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw result;
+    }
+
+    return result;
+  }
+
+  function submitHandler() {
     if (email && password && selectedCurrencyId) {
       mutate({
         email,

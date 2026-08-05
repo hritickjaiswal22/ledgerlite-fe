@@ -1,5 +1,7 @@
+import AccountsSummary from "@/features/accounts/components/accounts";
+
 function Accounts() {
-  return <h1>Accounts</h1>;
+  return <AccountsSummary />;
 }
 
 export default Accounts;
