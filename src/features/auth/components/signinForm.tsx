@@ -18,7 +18,7 @@ function SigninForm() {
       router.replace("/accounts");
     },
     onError: (error: any) => {
-      toast.error(error.message || "", {
+      toast.error(error.message || "Internal Server Error", {
         position: "top-right",
       });
     },
