@@ -49,73 +49,88 @@ export function isTokenExpired(token: string): boolean {
   }
 }
 
-export async function middleware(request: NextRequest) {
-  const accessToken = request.cookies.get("access_token")?.value;
-  const refreshToken = request.cookies.get("refresh_token")?.value;
+function redirectToLogin(request: NextRequest) {
+  const response = NextResponse.redirect(new URL("/signin", request.url));
 
-  // Extract the pathname from nextUrl
-  const { pathname } = request.nextUrl;
-
-  // 2. Check for exact page matches
-  const isAuthPage = PUBLIC_PAGES.includes(pathname);
-
-  // 3. Check for API prefixes (covers /api/auth/signin, /api/auth/refresh, etc.)
-  const isAuthApi = pathname.startsWith(AUTH_API_PREFIX);
-
-  // 4. Combine the logic
-  const isPublicRoute = isAuthPage || isAuthApi;
-
-  if (isPublicRoute) {
-    return NextResponse.next();
-  }
-
-  if (!refreshToken) {
-    return NextResponse.redirect(new URL("/signin", request.url));
-  }
-
-  if (accessToken) {
-    const isExpired = isTokenExpired(accessToken);
-
-    if (!isExpired) {
-      return NextResponse.next();
-    }
-  }
-
-  // refresh logic
-  const serverRes = await fetch(`${EXPRESS_URL}/auth/refresh`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      refreshToken,
-    }),
-  });
-
-  if (!serverRes.ok) {
-    return NextResponse.redirect(new URL("/signin", request.url));
-  }
-
-  const { data } = await serverRes.json();
-
-  request.cookies.set("access_token", data.accessToken);
-  request.cookies.set("refresh_token", data.refreshToken);
-
-  const response = NextResponse.next({
-    request: {
-      headers: request.headers, // Passes modified request.cookies to downstream components
-    },
-  });
-
-  response.cookies.set("access_token", data.accessToken, {
-    ...COOKIE_OPTIONS,
-    maxAge: ACCESS_TOKEN_COOKIE_AGE,
-  });
-
-  response.cookies.set("refresh_token", data.refreshToken, {
-    ...COOKIE_OPTIONS,
-    maxAge: REFRESH_TOKEN_COOKIE_AGE,
-  });
+  response.cookies.delete("access_token");
+  response.cookies.delete("refresh_token");
 
   return response;
+}
+
+export async function middleware(request: NextRequest) {
+  try {
+    const accessToken = request.cookies.get("access_token")?.value;
+    const refreshToken = request.cookies.get("refresh_token")?.value;
+
+    // Extract the pathname from nextUrl
+    const { pathname } = request.nextUrl;
+
+    // 2. Check for exact page matches
+    const isAuthPage = PUBLIC_PAGES.includes(pathname);
+
+    // 3. Check for API prefixes (covers /api/auth/signin, /api/auth/refresh, etc.)
+    const isAuthApi = pathname.startsWith(AUTH_API_PREFIX);
+
+    // 4. Combine the logic
+    const isPublicRoute = isAuthPage || isAuthApi;
+
+    if (isPublicRoute) {
+      return NextResponse.next();
+    }
+
+    if (!refreshToken) {
+      return redirectToLogin(request);
+    }
+
+    if (accessToken) {
+      const isExpired = isTokenExpired(accessToken);
+
+      if (!isExpired) {
+        return NextResponse.next();
+      }
+    }
+
+    // refresh logic
+    const serverRes = await fetch(`${EXPRESS_URL}/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        refreshToken,
+      }),
+    });
+
+    if (!serverRes.ok) {
+      return redirectToLogin(request);
+    }
+
+    const { data } = await serverRes.json();
+
+    request.cookies.set("access_token", data.accessToken);
+    request.cookies.set("refresh_token", data.refreshToken);
+
+    const response = NextResponse.next({
+      request: {
+        headers: request.headers, // Passes modified request.cookies to downstream components
+      },
+    });
+
+    response.cookies.set("access_token", data.accessToken, {
+      ...COOKIE_OPTIONS,
+      maxAge: ACCESS_TOKEN_COOKIE_AGE,
+    });
+
+    response.cookies.set("refresh_token", data.refreshToken, {
+      ...COOKIE_OPTIONS,
+      maxAge: REFRESH_TOKEN_COOKIE_AGE,
+    });
+
+    return response;
+  } catch (error) {
+    console.error("Middleware error:", error);
+
+    return redirectToLogin(request);
+  }
 }
 
 export const config = {

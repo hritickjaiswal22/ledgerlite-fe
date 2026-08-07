@@ -42,7 +42,7 @@ function SigninForm() {
     return result;
   }
 
-  async function submitHandler() {
+  function submitHandler() {
     if (email && password) {
       mutate({
         email,
