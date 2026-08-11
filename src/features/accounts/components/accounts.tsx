@@ -16,11 +16,6 @@ async function Accounts() {
   });
   const data = await response.json();
 
-  console.log(
-    "-------------------------Hello World from Accounts--------------------",
-  );
-  console.log(accessToken, data);
-
   return (
     <main>
       <h1>Accounts</h1>

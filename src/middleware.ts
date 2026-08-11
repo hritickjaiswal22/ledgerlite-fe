@@ -136,6 +136,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   // Explicitly list ONLY the paths where this middleware should run.
   matcher: [
+    "/",
     "/signup",
     "/signin",
     // Add all your protected routes here.
