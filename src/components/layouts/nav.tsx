@@ -8,7 +8,7 @@ export default function NavLinks() {
   const pathname = usePathname();
 
   const navLinks = [
-    { name: "Dashboard", href: "/dashboard" },
+    { name: "Dashboard", href: "/" },
     { name: "Accounts", href: "/accounts" },
     { name: "Transactions", href: "/transactions" },
     { name: "Categories", href: "/categories" },

@@ -49,6 +49,15 @@
 
   --color-input-border: var(--input-border);
   --color-input-bg: var(--input-bg);
+
+  --color-header-bg: var(--header-bg);
+  --color-table-header-bg: var(--table-header-bg);
+  --color-table-body-bg: var(--table-body-bg);
+
+  --color-profit: var(--profit);
+  --color-profit-foreground: var(--profit-foreground);
+  --color-loss: var(--loss);
+  --color-loss-foreground: var(--loss-foreground);
 }
 
 :root {
@@ -88,6 +97,17 @@
   /* Input Variables */
   --input-border: oklch(0.8289 0.0279 292.67);
   --input-bg: oklch(1 0 0 / 50%);
+
+  /* Component Variables */
+  --header-bg: oklch(0.9826 0.0095 299.24 / 80%);
+  --table-header-bg: oklch(0.9669 0.016 282.28 / 50%);
+  --table-body-bg: oklch(1 0 0);
+
+  /* Domain roles Variables */
+  --profit: oklch(0.8858 0.1502 162.13);
+  --profit-foreground: oklch(0.4851 0.1054 162.63);
+  --loss: oklch(0.918251 0.041771 25.2259);
+  --loss-foreground: oklch(0.417061 0.170153 27.3788);
 }
 
 .dark {
@@ -126,6 +146,17 @@
   /* Input Variables */
   --input-border: oklch(0.2795 0.0368 260.03);
   --input-bg: oklch(0.2077 0.0398 265.75 / 50%);
+
+  /* Component Variables */
+  --header-bg: oklch(0.2247 0.0391 265.98 / 80%);
+  --table-header-bg: oklch(0.1288 0.0406 264.7 / 50%);
+  --table-body-bg: oklch(0.2077 0.0398 265.75);
+
+  /* Domain roles Variables */
+  --profit: oklch(0.8858 0.1502 162.13);
+  --profit-foreground: oklch(0.4851 0.1054 162.63);
+  --loss: oklch(0.918251 0.041771 25.2259);
+  --loss-foreground: oklch(0.417061 0.170153 27.3788);
 }
 
 @layer base {
