@@ -36,3 +36,43 @@ export async function addAccount(body: AddAccountRequestPayload) {
     };
   }
 }
+
+export async function editAccount(accountId: string, newName: string) {
+  try {
+    // Await the cookies function to get the cookie store
+    const cookieStore = await cookies();
+
+    // Read a specific cookie
+    const accessToken = cookieStore.get("access_token")?.value;
+
+    if (!accessToken) throw "Error";
+
+    const response = await fetch(
+      `${process.env.EXPRESS_API_URL}/accounts/${accountId}`,
+      {
+        method: "PATCH", // or 'POST', 'PUT', etc.
+        body: JSON.stringify({
+          name: newName,
+        }),
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json", // Usually required when sending data
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const data = await response.json();
+
+      throw data?.message || "Error";
+    }
+
+    revalidatePath("/accounts");
+
+    return { error: null }; // success
+  } catch (error) {
+    return {
+      error: (error as string) || "Could not add item. Please try again.",
+    };
+  }
+}

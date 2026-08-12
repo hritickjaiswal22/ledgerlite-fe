@@ -9,6 +9,7 @@ import {
 
 import { AccountResponse } from "@/features/accounts/types";
 import Card from "@/components/ui/card";
+import EditAccountForm from "@/features/accounts/components/edit-account-form";
 import { cn, formatWithCommas } from "@/lib/utils";
 
 async function Accounts() {
@@ -70,9 +71,7 @@ async function Accounts() {
                 )}
               </div>
 
-              <button className="p-3 rounded-xl opacity-90 bg-none group hover:bg-primary transition-colors cursor-pointer">
-                <Pencil className="text-primary transition-colors group-hover:text-white " />
-              </button>
+              <EditAccountForm account={account} />
             </div>
 
             <h3 className="text-headline-lg font-semibold text-foreground mb-3">
