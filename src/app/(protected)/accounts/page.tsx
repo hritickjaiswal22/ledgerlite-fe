@@ -2,7 +2,7 @@ import { Suspense } from "react";
 
 import AccountsDetails from "@/features/accounts/components/accounts";
 import AccountsSkeleton from "@/features/accounts/components/accounts-skeleton";
-import { Button } from "@/components/ui/button";
+import AddAccountForm from "@/features/accounts/components/add-account-form";
 
 function Accounts() {
   return (
@@ -18,9 +18,7 @@ function Accounts() {
           </p>
         </div>
 
-        <Button type="submit" size={"lg"} className={"rounded-2xl"}>
-          + Add Account
-        </Button>
+        <AddAccountForm />
       </header>
 
       <Suspense fallback={<AccountsSkeleton />}>
