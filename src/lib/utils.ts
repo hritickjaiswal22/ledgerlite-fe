@@ -39,3 +39,16 @@ export function randomColorGenerator() {
 
   return `#${f(0)}${f(8)}${f(4)}`;
 }
+
+export function formatWithCommas(input: string | number) {
+  // Convert string input to a number, or keep it if it's already a number
+  const number = typeof input === "string" ? Number(input) : input;
+
+  // Check if the input is a valid number
+  if (isNaN(number) || input === "" || input === null) {
+    return "Invalid Number";
+  }
+
+  // Format the number using the US English locale for standard comma grouping
+  return new Intl.NumberFormat("en-US").format(number);
+}

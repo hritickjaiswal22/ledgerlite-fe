@@ -1,7 +1,33 @@
-import AccountsSummary from "@/features/accounts/components/accounts";
+import { Suspense } from "react";
+
+import AccountsDetails from "@/features/accounts/components/accounts";
+import AccountsSkeleton from "@/features/accounts/components/accounts-skeleton";
+import { Button } from "@/components/ui/button";
 
 function Accounts() {
-  return <AccountsSummary />;
+  return (
+    <section>
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+        <div>
+          <h1 className="text-4xl leading-11 font-bold text-foreground">
+            Accounts
+          </h1>
+
+          <p className="text-muted-foreground mt-2">
+            Manage your bank accounts, wallets, and cash flow{" "}
+          </p>
+        </div>
+
+        <Button type="submit" size={"lg"} className={"rounded-2xl"}>
+          + Add Account
+        </Button>
+      </header>
+
+      <Suspense fallback={<AccountsSkeleton />}>
+        <AccountsDetails />
+      </Suspense>
+    </section>
+  );
 }
 
 export default Accounts;

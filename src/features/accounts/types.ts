@@ -6,3 +6,7 @@ export interface Account {
   balance: number;
   id: string;
 }
+
+export interface AccountResponse {
+  data: Array<Account>;
+}
