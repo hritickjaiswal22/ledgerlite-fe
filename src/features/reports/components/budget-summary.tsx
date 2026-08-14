@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import ErrorDisplay from "@/components/error-inline";
 import { BudgetSummaryResponse } from "@/features/reports/types";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +33,11 @@ async function BudgetSummary() {
     },
   );
 
-  if (!response.ok) return <h1>Error</h1>;
+  if (!response.ok) {
+    const data = await response.json();
+
+    return <ErrorDisplay errorMessage={data.message} />;
+  }
 
   const { data } = (await response.json()) as BudgetSummaryResponse;
 

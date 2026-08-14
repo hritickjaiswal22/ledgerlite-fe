@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 
 import Card from "@/components/ui/card";
+import ErrorDisplay from "@/components/error-inline";
 import { CategorySummaryResponse } from "@/features/reports/types";
 import { cn, randomColorGenerator } from "@/lib/utils";
 
@@ -36,7 +37,11 @@ async function CategorySummary() {
     ),
   ]);
 
-  if (!expenseResponse.ok || !incomeResponse.ok) return <h1>Error</h1>;
+  if (!expenseResponse.ok || !incomeResponse.ok) {
+    const data = await expenseResponse.json();
+
+    return <ErrorDisplay errorMessage={data.message} />;
+  }
 
   const { data: expenses } =
     (await expenseResponse.json()) as CategorySummaryResponse;
