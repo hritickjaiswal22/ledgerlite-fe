@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 
 import Card from "@/components/ui/card";
+import ErrorDisplay from "@/components/error-inline";
 import { MonthsSummaryResponse } from "@/features/reports/types";
 
 async function MonthsSummary() {
@@ -23,7 +24,11 @@ async function MonthsSummary() {
     },
   );
 
-  if (!response.ok) return <h1>Error</h1>;
+  if (!response.ok) {
+    const data = await response.json();
+
+    return <ErrorDisplay errorMessage={data.message} />;
+  }
 
   const { data } = (await response.json()) as MonthsSummaryResponse;
 

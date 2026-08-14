@@ -156,7 +156,7 @@
   --profit: oklch(0.8858 0.1502 162.13);
   --profit-foreground: oklch(0.4851 0.1054 162.63);
   --loss: oklch(0.918251 0.041771 25.2259);
-  --loss-foreground: oklch(0.417061 0.170153 27.3788);
+  --loss-foreground: oklch(0.5891 0.2116 23.77);
 }
 
 @layer base {

@@ -10,6 +10,7 @@ import {
 import { AccountResponse } from "@/features/accounts/types";
 import Card from "@/components/ui/card";
 import EditAccountForm from "@/features/accounts/components/edit-account-form";
+import ErrorDisplay from "@/components/error-inline";
 import { cn, formatWithCommas } from "@/lib/utils";
 
 async function Accounts() {
@@ -26,6 +27,13 @@ async function Accounts() {
       "Content-Type": "application/json", // Usually required when sending data
     },
   });
+
+  if (!response.ok) {
+    const data = await response.json();
+
+    return <ErrorDisplay errorMessage={data.message} />;
+  }
+
   const { data }: AccountResponse = await response.json();
   const totalBalance = data.reduce(
     (acc, account) => acc + Number(account.balance),
