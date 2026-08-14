@@ -36,8 +36,6 @@ async function BudgetSummary() {
 
   const { data } = (await response.json()) as BudgetSummaryResponse;
 
-  console.log(data);
-
   return (
     <div className="mt-6 border border-border rounded-[8px]">
       <Card className="rounded-b-none border-0">

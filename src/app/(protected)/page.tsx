@@ -9,7 +9,7 @@ import BudgetSummarySkeleton from "@/features/reports/components/budget-summary-
 
 function Dashboard() {
   return (
-    <main className="max-w-7xl mx-auto px-4 md:px-12 py-8">
+    <>
       <Suspense fallback={<MonthsSummarySkeleton />}>
         <MonthsSummary />
       </Suspense>
@@ -21,7 +21,7 @@ function Dashboard() {
       <Suspense fallback={<BudgetSummarySkeleton />}>
         <BudgetSummary />
       </Suspense>
-    </main>
+    </>
   );
 }
 
