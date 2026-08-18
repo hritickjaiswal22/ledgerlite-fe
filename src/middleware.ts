@@ -91,6 +91,8 @@ export async function middleware(request: NextRequest) {
       }
     }
 
+    console.log("Middleware");
+
     // refresh logic
     const serverRes = await fetch(`${EXPRESS_URL}/auth/refresh`, {
       method: "POST",
