@@ -91,8 +91,6 @@ export async function middleware(request: NextRequest) {
       }
     }
 
-    console.log("Middleware");
-
     // refresh logic
     const serverRes = await fetch(`${EXPRESS_URL}/auth/refresh`, {
       method: "POST",
@@ -141,6 +139,8 @@ export const config = {
     "/",
     "/signup",
     "/signin",
+    "/accounts",
+    "/transactions",
     // Add all your protected routes here.
     // The "/:path*" suffix ensures all sub-routes (like /accounts/settings) are also protected.
     "/accounts/:path*",

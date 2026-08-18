@@ -25,27 +25,29 @@ export function DatePickerWithRange({
   return (
     <div className="">
       <Popover>
-        <PopoverTrigger>
-          <Button
-            variant="outline"
-            id="date-picker-range"
-            className="justify-start px-2.5 py-7.25 font-normal"
-          >
-            <CalendarIcon />
-            {date?.from ? (
-              date.to ? (
-                <>
-                  {format(date.from, "LLL dd, y")} -{" "}
-                  {format(date.to, "LLL dd, y")}
-                </>
+        <PopoverTrigger
+          render={
+            <Button
+              variant="outline"
+              id="date-picker-range"
+              className="justify-start px-2.5 py-7.25 font-normal"
+            >
+              <CalendarIcon />
+              {date?.from ? (
+                date.to ? (
+                  <>
+                    {format(date.from, "LLL dd, y")} -{" "}
+                    {format(date.to, "LLL dd, y")}
+                  </>
+                ) : (
+                  format(date.from, "LLL dd, y")
+                )
               ) : (
-                format(date.from, "LLL dd, y")
-              )
-            ) : (
-              <span>Pick a date</span>
-            )}
-          </Button>
-        </PopoverTrigger>
+                <span>Pick a date</span>
+              )}
+            </Button>
+          }
+        ></PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="range"
