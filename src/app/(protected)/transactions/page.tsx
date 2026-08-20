@@ -4,6 +4,7 @@ import Transactions from "@/features/transactions/components/transactions";
 import ErrorDisplay from "@/components/error-inline";
 import { Account } from "@/features/accounts/types";
 import { Category } from "@/features/categories/types";
+import AddTransactionForm from "@/features/transactions/components/add-transaction-form";
 
 async function TransactionsPage() {
   // Await the cookies function to get the cookie store
@@ -58,6 +59,8 @@ async function TransactionsPage() {
             Manage and track your financial movements across all accounts.
           </p>
         </div>
+
+        <AddTransactionForm accounts={accounts} categories={categories} />
       </header>
 
       <Transactions accounts={accounts} categories={categories} />

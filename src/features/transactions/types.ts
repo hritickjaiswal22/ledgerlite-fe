@@ -29,3 +29,12 @@ export interface GetTransactionsParams {
   startDate?: string | Date;
   endDate?: string | Date;
 }
+
+export interface AddTransactionRequestPayload {
+  accountId: string;
+  categoryId: string;
+  amount: number;
+  type: "income" | "expense";
+  transactionDate: string;
+  description: string;
+}

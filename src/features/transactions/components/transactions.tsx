@@ -44,7 +44,7 @@ interface TransactionProps {
   categories: Array<Category>;
 }
 
-interface SelectOptions {
+export interface SelectOptions {
   label: string;
   value: null | string;
 }
