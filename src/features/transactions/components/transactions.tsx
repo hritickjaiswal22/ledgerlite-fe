@@ -2,13 +2,19 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { type DateRange } from "react-day-picker";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useInfiniteQuery,
+  QueryFunctionContext,
+} from "@tanstack/react-query";
 
 import { Account } from "@/features/accounts/types";
 import { Category } from "@/features/categories/types";
 import {
   TransactionResponse,
   GetTransactionsParams,
+  TransactionType,
 } from "@/features/transactions/types";
 import {
   Select,
@@ -22,6 +28,16 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { DatePickerWithRange } from "@/components/ui/date-range";
 import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { cn, formatDate } from "@/lib/utils";
+import TransactionTablesSkeleton from "@/features/transactions/components/transactions-table-skeleton";
 
 interface TransactionProps {
   accounts: Array<Account>;
@@ -33,33 +49,111 @@ interface SelectOptions {
   value: null | string;
 }
 
+type TransactionFilters = {
+  selectedAccountId?: string | null;
+  selectedCategoryId?: string | null;
+  transactionType: "all" | TransactionType; // Replace string with your TransactionType
+  date?: {
+    from: Date;
+    to: Date;
+  } | null;
+};
+
+type TransactionQueryKey = ["transactions", TransactionFilters];
+type PageParamType = TransactionResponse["nextCursor"] | null;
+
+async function getTransactions({
+  pageParam = null,
+  queryKey,
+}: QueryFunctionContext<
+  TransactionQueryKey,
+  PageParamType
+>): Promise<TransactionResponse> {
+  const [_key, filters] = queryKey;
+
+  const params: GetTransactionsParams = {
+    limit: 10,
+  };
+  if (filters?.selectedAccountId) {
+    params.accountId = filters?.selectedAccountId;
+  }
+  if (filters?.selectedCategoryId) {
+    params.categoryId = filters?.selectedCategoryId;
+  }
+  if (filters?.transactionType !== "all") {
+    params.type = filters?.transactionType as "income" | "expense";
+  }
+  if (filters?.date) {
+    params.startDate = filters?.date?.from;
+    params.endDate = filters?.date?.to;
+  }
+  if (pageParam) {
+    params.cursorId = pageParam.cursorId;
+    params.cursorDate = pageParam.cursorDate;
+  }
+
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      if (value instanceof Date) {
+        searchParams.append(key, value.toISOString());
+      } else {
+        searchParams.append(key, String(value));
+      }
+    }
+  });
+
+  const queryString = searchParams.toString();
+  const endpoint = `/api/transactions${queryString ? `?${queryString}` : ""}`;
+
+  const res = await fetch(endpoint);
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch transactions");
+  }
+
+  const { data } = await res.json();
+
+  return data;
+}
+
 function Transaction({ accounts, categories }: TransactionProps) {
+  const today = new Date();
+
   const [selectedAccountId, setSelectedAccountId] = useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [transactionType, setTransactionType] = useState("all");
-  const today = new Date();
-
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(today.getFullYear(), today.getMonth(), 1),
     to: today,
   });
-  const {
-    data: transactionResponse,
-    error: transactionError,
-    refetch,
-  } = useQuery({
-    queryKey: [
-      "transactions",
-      selectedAccountId,
-      selectedCategoryId,
-      transactionType,
-      date?.from?.toISOString(),
-      date?.to?.toISOString(),
-    ],
-    queryFn: getTransactions,
-    enabled: false,
-    retry: false,
+  const [appliedFilters, setAppliedFilters] = useState<TransactionFilters>({
+    transactionType: "all",
+    date: {
+      from: new Date(today.getFullYear(), today.getMonth(), 1),
+      to: today,
+    },
   });
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error: transactionError,
+  } = useInfiniteQuery({
+    queryKey: ["transactions", appliedFilters],
+    queryFn: getTransactions,
+    getNextPageParam: (lastPage) => {
+      // If hasNextPage is true, return the cursor object.
+      // This object becomes the 'pageParam' for the next fetch request.
+      return lastPage.hasNextPage ? lastPage.nextCursor : undefined;
+    },
+  });
+
+  const transactions = data?.pages.flatMap((page) => page.transactions) ?? [];
 
   const accountsOptions = useMemo(() => {
     const values: Array<SelectOptions> = accounts.map((account) => ({
@@ -90,51 +184,29 @@ function Transaction({ accounts, categories }: TransactionProps) {
     });
   }
 
-  async function getTransactions(): Promise<TransactionResponse> {
-    const params: GetTransactionsParams = {
-      limit: 1,
+  function handleApplyFilters() {
+    const temp: TransactionFilters = {
+      transactionType: "all",
     };
+
     if (selectedAccountId) {
-      params.accountId = selectedAccountId;
+      temp.selectedAccountId = selectedAccountId;
     }
     if (selectedCategoryId) {
-      params.categoryId = selectedCategoryId;
+      temp.selectedCategoryId = selectedCategoryId;
     }
     if (transactionType !== "all") {
-      params.type = transactionType as "income" | "expense";
+      temp.transactionType = transactionType as "income" | "expense";
     }
-    if (date) {
-      params.startDate = date?.from;
-      params.endDate = date?.to;
-    }
-
-    const searchParams = new URLSearchParams();
-
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        if (value instanceof Date) {
-          searchParams.append(key, value.toISOString());
-        } else {
-          searchParams.append(key, String(value));
-        }
-      }
-    });
-
-    const queryString = searchParams.toString();
-    const endpoint = `/api/transactions${queryString ? `?${queryString}` : ""}`;
-
-    const res = await fetch(endpoint);
-
-    if (!res.ok) {
-      throw new Error("Failed to fetch transactions");
+    if (date && date.from && date.to) {
+      temp.date = {
+        from: date.from,
+        to: date.to,
+      };
     }
 
-    const { data } = await res.json();
-
-    return data;
+    setAppliedFilters(temp);
   }
-
-  console.log(transactionResponse);
 
   return (
     <main>
@@ -215,7 +287,7 @@ function Transaction({ accounts, categories }: TransactionProps) {
           </Button>
 
           <Button
-            onClick={() => refetch()}
+            onClick={handleApplyFilters}
             size={"default"}
             className={"rounded-2xl cursor-pointer"}
           >
@@ -230,8 +302,89 @@ function Transaction({ accounts, categories }: TransactionProps) {
             Error. Please try again
           </h1>
         </div>
-      ) : transactionResponse &&
-        transactionResponse.transactions.length > 0 ? null : (
+      ) : isLoading ? (
+        <TransactionTablesSkeleton />
+      ) : transactions.length > 0 ? (
+        <div className="rounded-2xl overflow-hidden shadow-sm">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="uppercase">Date</TableHead>
+                <TableHead className="uppercase">Category</TableHead>
+                <TableHead className="uppercase">Description</TableHead>
+                <TableHead className="uppercase">Account</TableHead>
+                <TableHead className="uppercase">Type</TableHead>
+                <TableHead className="uppercase">Amount</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {transactions.map((transaction) => {
+                return (
+                  <TableRow key={transaction.id}>
+                    <TableCell>
+                      <span className="text-[14px] leading-5 font-normal">
+                        {formatDate(transaction.transactionDate) || "N/A"}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {categories.find(
+                        (category) => category.id === transaction.categoryId,
+                      )?.name || "N/A"}
+                    </TableCell>
+                    <TableCell>{transaction.description || "N/A"}</TableCell>
+                    <TableCell>
+                      {accounts.find(
+                        (account) => account.id === transaction.accountId,
+                      )?.name || "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={cn(
+                          "text-[11px] font-bold px-2 py-0.5 rounded uppercase tracking-wider",
+                          transaction.transactionType === "expense"
+                            ? "bg-loss text-loss-foreground"
+                            : "bg-profit text-profit-foreground",
+                        )}
+                      >
+                        {transaction.transactionType.toUpperCase() || "N/A"}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={cn(
+                          "font-bold",
+                          transaction.transactionType === "expense"
+                            ? "text-loss-foreground"
+                            : "text-profit-foreground",
+                        )}
+                      >
+                        {transaction.transactionType === "expense"
+                          ? `- ${transaction.amount}`
+                          : `+ ${transaction.amount}`}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+
+          <div className="px-6 py-4 bg-card flex justify-center items-center">
+            {hasNextPage && (
+              <Button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                variant="ghost"
+                size={"sm"}
+                className={"cursor-pointer"}
+              >
+                {isFetchingNextPage ? "Loading more..." : "View More"}
+              </Button>
+            )}
+          </div>
+        </div>
+      ) : (
         <div className="bg-card border border-border rounded-2xl p-4 mb-8 shadow-sm">
           <h1 className="text-center text-2xl font-bold text-card-foreground">
             No Data to show

@@ -144,6 +144,7 @@ export const config = {
     // Add all your protected routes here.
     // The "/:path*" suffix ensures all sub-routes (like /accounts/settings) are also protected.
     "/accounts/:path*",
+    "/transactions/:path*",
     // "/dashboard/:path*",
     // "/profile/:path*"
     // Expand as add more routes
