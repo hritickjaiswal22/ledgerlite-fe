@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import Card from "@/components/ui/card";
 import ErrorDisplay from "@/components/error-inline";
 import { MonthsSummaryResponse } from "@/features/reports/types";
+import { formatWithCommas } from "@/lib/utils";
 
 async function MonthsSummary() {
   // Await the cookies function to get the cookie store
@@ -41,7 +42,7 @@ async function MonthsSummary() {
           </p>
 
           <h2 className="text-4xl leading-11 font-bold mt-3 text-profit-foreground">
-            + {Number(data.income).toFixed(2)}
+            + {formatWithCommas(Number(data.income).toFixed(2))}
           </h2>
         </div>
       </Card>
@@ -52,7 +53,7 @@ async function MonthsSummary() {
           </p>
 
           <h2 className="text-4xl leading-11 font-bold mt-3 text-loss-foreground">
-            - {Number(data.expense).toFixed(2)}
+            - {formatWithCommas(Number(data.expense).toFixed(2))}
           </h2>
         </div>
       </Card>
@@ -63,7 +64,7 @@ async function MonthsSummary() {
           </p>
 
           <h2 className="text-4xl leading-11 font-bold mt-3 text-primary">
-            {Number(data.income - data.expense).toFixed(2)}
+            {formatWithCommas(Number(data.income - data.expense).toFixed(2))}
           </h2>
         </div>
       </Card>

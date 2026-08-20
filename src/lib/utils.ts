@@ -52,3 +52,12 @@ export function formatWithCommas(input: string | number) {
   // Format the number using the US English locale for standard comma grouping
   return new Intl.NumberFormat("en-US").format(number);
 }
+
+export function formatDate(isoString: Date) {
+  const date = new Date(isoString);
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import ErrorDisplay from "@/components/error-inline";
 import { BudgetSummaryResponse } from "@/features/reports/types";
-import { cn } from "@/lib/utils";
+import { cn, formatWithCommas } from "@/lib/utils";
 
 async function BudgetSummary() {
   // Await the cookies function to get the cookie store
@@ -77,12 +77,12 @@ async function BudgetSummary() {
                   </TableCell>
                   <TableCell>
                     <span className="font-mono text-body-sm">
-                      {budget.budget}
+                      {formatWithCommas(budget.budget)}
                     </span>
                   </TableCell>
                   <TableCell>
                     <span className="font-mono text-body-sm">
-                      {budget.spent}
+                      {formatWithCommas(budget.spent)}
                     </span>
                   </TableCell>
                   <TableCell>
@@ -94,7 +94,7 @@ async function BudgetSummary() {
                           : "text-loss-foreground",
                       )}
                     >
-                      {budget.remaining}
+                      {formatWithCommas(budget.remaining)}
                     </span>
                   </TableCell>
                   <TableCell>
